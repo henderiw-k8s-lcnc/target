@@ -1,0 +1,170 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.9.2
+  creationTimestamp: null
+  name: targets.target.yndd.io
+spec:
+  group: target.yndd.io
+  names:
+    categories:
+    - yndd
+    - topo
+    kind: Target
+    listKind: TargetList
+    plural: targets
+    singular: target
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.conditions[?(@.kind=='Synced')].status
+      name: SYNC
+      type: string
+    - jsonPath: .status.conditions[?(@.kind=='Ready')].status
+      name: READY
+      type: string
+    - description: address to connect to the target'
+      jsonPath: .spec.properties.config.address
+      name: ADDRESS
+      type: string
+    - description: target hostname'
+      jsonPath: .spec.discoveryInfo.hostname
+      name: HOSTNAME
+      type: string
+    - description: Protocol used to communicate to the target
+      jsonPath: .spec.properties.config.protocol
+      name: PROTOCOL
+      type: string
+    - description: VendorType of target
+      jsonPath: .spec.discoveryInfo.vendorType
+      name: VENDORTYPE
+      type: string
+    - description: Platform of target
+      jsonPath: .spec.discoveryInfo.platform
+      name: PLATFORM
+      type: string
+    - description: SW version of the target
+      jsonPath: .spec.discoveryInfo.swVersion
+      name: SWVERSION
+      type: string
+    - description: macAddress of the target
+      jsonPath: .spec.discoveryInfo.macAddress
+      name: MACADDRESS
+      type: string
+    - description: serialNumber of the target
+      jsonPath: .spec.discoveryInfo.serialNumber
+      name: SERIALNBR
+      type: string
+    - description: last time the target was updated
+      jsonPath: .spec.discoveryInfo.lastSeen
+      name: LASTSEEN
+      type: date
+    - jsonPath: .metadata.creationTimestamp
+      name: AGE
+      type: date
+    name: v1
+    schema:
+      openAPIV3Schema:
+        description: Target is the Schema for the targets API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: TargetSpec struct
+            properties:
+              discoveryInfo:
+                description: DiscoveryInfo
+                properties:
+                  hostname:
+                    description: Host name of the target
+                    type: string
+                  lastSeen:
+                    description: Last discovery time
+                    format: date-time
+                    type: string
+                  macAddress:
+                    description: the Mac address of the target
+                    type: string
+                  platform:
+                    description: the Kind of the target
+                    type: string
+                  serialNumber:
+                    description: the Serial Number of the target
+                    type: string
+                  supportedEncodings:
+                    description: Supported Encodings of the target
+                    items:
+                      type: string
+                    type: array
+                  swVersion:
+                    description: SW version of the target
+                    type: string
+                  vendorType:
+                    description: the VendorType of the target
+                    type: string
+                type: object
+              properties:
+                description: Properties define the properties of the Target
+                properties:
+                  allocation:
+                    additionalProperties:
+                      properties:
+                        serviceIdentity:
+                          type: string
+                        serviceName:
+                          type: string
+                      type: object
+                    type: object
+                  config:
+                    properties:
+                      address:
+                        type: string
+                      credentialName:
+                        type: string
+                      encoding:
+                        enum:
+                        - unknown
+                        - JSON
+                        - JSON_IETF
+                        - bytes
+                        - protobuf
+                        - ASCII
+                        type: string
+                      insecure:
+                        type: boolean
+                      protocol:
+                        enum:
+                        - unknown
+                        - gnmi
+                        - netconf
+                        type: string
+                      proxy:
+                        type: string
+                      skipVerify:
+                        type: boolean
+                      tlsCredentialName:
+                        type: string
+                    type: object
+                  vendorType:
+                    enum:
+                    - unknown
+                    - nokiaSRL
+                    - nokiaSROS
+                    type: string
+                type: object
+            type: object
+          status:
+            description: TargetStatus defines the observed state of TargetNode
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
